@@ -118,7 +118,7 @@ class LinuxPidKiller implements PidKillerInterface
             'id' => $id,
             QueueClient::KEY_DELAY_SECOND => $record['delaySeconds'],
             'Body' => $record['info'] ?? null,
-            'TracerContext' => \rollun\utils\Json\Serializer::jsonSerialize(base64_encode($this->tracer->getContext()))
+            'TracerContext' => base64_encode(\rollun\utils\Json\Serializer::jsonSerialize($this->tracer->getContext()))
         ]));
 
         $this->logger->debug("PID-KILLER add pid {pid} to queue at {date}", [
