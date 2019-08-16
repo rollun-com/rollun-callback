@@ -59,13 +59,13 @@ class WorkerManager
     private $slotTakenSecondsLimit;
 
     /**
-     * @var CacheInterface
+     * @var StorageInterface
      */
     private $slotCache;
 
     /**
      * WorkerManager constructor.
-     * @param CacheInterface $slotCache
+     * @param StorageInterface $slotCache
      * @param InterrupterInterface $interrupter
      * @param string $workerManagerName
      * @param int $processCount
@@ -116,7 +116,7 @@ class WorkerManager
     {
         $span = $this->tracer->start('WorkerManager::__invoke', [new StringTag('name', $this->workerManagerName)]);
 
-        $slots = Serializer::jsonUnserialize($this->slotCache->get('slots'));
+        $slots = Serializer::jsonUnserialize($this->slotCache->getItem('slots'));
 
         $freeSlots = $this->setupSlots($slots);
 
@@ -135,7 +135,7 @@ class WorkerManager
             }
         }
 
-        $this->slotCache->set('slots', Serializer::jsonSerialize($slots));
+        $this->slotCache->setItem('slots', Serializer::jsonSerialize($slots));
 
         $span->addTag(new StringTag('slots', Serializer::jsonSerialize($slots)));
         $this->tracer->finish($span);
