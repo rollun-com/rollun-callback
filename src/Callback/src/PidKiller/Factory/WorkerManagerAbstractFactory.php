@@ -37,7 +37,7 @@ class WorkerManagerAbstractFactory implements AbstractFactoryInterface
 
     const DEFAULT_CLASS = WorkerManager::class;
 
-    const KEY_TABLE_GATEWAY = 'tableGateway';
+    const KEY_CACHE_STORAGE = 'cache_storage';
 
     const KEY_PROCESS = 'process';
 
@@ -49,8 +49,8 @@ class WorkerManagerAbstractFactory implements AbstractFactoryInterface
     {
         $serviceConfig = $options ?? $container->get('config')[self::class][$requestedName];
 
-        if (!isset($serviceConfig[self::KEY_TABLE_GATEWAY])) {
-            throw new \InvalidArgumentException("Invalid option '" . self::KEY_TABLE_GATEWAY . "'");
+        if (!isset($serviceConfig[self::KEY_CACHE_STORAGE])) {
+            throw new \InvalidArgumentException("Invalid option '" . self::KEY_CACHE_STORAGE . "'");
         }
 
         if (!isset($serviceConfig[self::KEY_PROCESS])) {
@@ -65,13 +65,14 @@ class WorkerManagerAbstractFactory implements AbstractFactoryInterface
             throw new \InvalidArgumentException("Invalid option '" . self::KEY_PROCESS_COUNT . "'");
         }
 
-        $tableGateway = is_string($serviceConfig[self::KEY_TABLE_GATEWAY]) ? $container->get($serviceConfig[self::KEY_TABLE_GATEWAY]) : $serviceConfig[self::KEY_TABLE_GATEWAY];
+        $cacheStorage = is_string($serviceConfig[self::KEY_CACHE_STORAGE]) ? $container->get($serviceConfig[self::KEY_CACHE_STORAGE]) : $serviceConfig[self::KEY_CACHE_STORAGE];
+
         $process = is_string($serviceConfig[self::KEY_PROCESS]) ? $container->get($serviceConfig[self::KEY_PROCESS]) : $serviceConfig[self::KEY_PROCESS];
         $workerManagerName = $serviceConfig[self::KEY_WORKER_MANAGER_NAME];
         $processCount = $serviceConfig[self::KEY_PROCESS_COUNT];
         $class = $serviceConfig[self::KEY_CLASS];
 
-        return new $class($tableGateway, $process, $workerManagerName, $processCount);
+        return new $class($cacheStorage, $process, $workerManagerName, $processCount);
     }
 
     public function canCreate(ContainerInterface $container, $requestedName)

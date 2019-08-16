@@ -6,6 +6,7 @@ namespace rollun\callback\PidKiller\Factory;
 
 use Interop\Container\ContainerInterface;
 use Interop\Container\Exception\ContainerException;
+use Psr\SimpleCache\CacheInterface;
 use rollun\callback\Callback\Interrupter\Factory\ProcessAbstractFactory;
 use rollun\callback\Callback\Interrupter\InterrupterInterface;
 use rollun\callback\Callback\Interrupter\Process;
@@ -15,6 +16,8 @@ use rollun\callback\PidKiller\WorkerProducer;
 use rollun\callback\Queues\Factory\QueueClientAbstractFactory;
 use rollun\callback\Queues\Factory\SqsAdapterAbstractFactory;
 use rollun\callback\Queues\QueueClient;
+use Zend\Cache\Psr\SimpleCache\SimpleCacheDecorator;
+use Zend\Cache\StorageFactory;
 use Zend\ServiceManager\Exception\ServiceNotCreatedException;
 use Zend\ServiceManager\Exception\ServiceNotFoundException;
 use Zend\ServiceManager\Factory\AbstractFactoryInterface;
@@ -108,9 +111,24 @@ class WorkerSystemAbstractFactory implements AbstractFactoryInterface
                 ),
             WorkerManagerAbstractFactory::KEY_PROCESS_COUNT =>
                 $options[WorkerManagerAbstractFactory::KEY_PROCESS_COUNT] ?? self::DEFAULT_PROCESS_COUNT,
-            WorkerManagerAbstractFactory::KEY_TABLE_GATEWAY =>
-                $options[WorkerManagerAbstractFactory::KEY_TABLE_GATEWAY] ?? self::DEFAULT_TABLE_GATEWAY,
+            WorkerManagerAbstractFactory::KEY_CACHE_STORAGE =>
+                $options[WorkerManagerAbstractFactory::KEY_CACHE_STORAGE] ?? self::buildStorage($container, $requestedName, $options),
         ]);
+    }
+
+    private static function buildStorage(ContainerInterface $container, $requestedName, array $options = null): CacheInterface
+    {
+        $interrupterName = sprintf('%s_CacheStorage', $requestedName);
+        $storage = StorageFactory::factory([
+            'adapter' => 'filesystem',
+            'options' => [
+                'ttl' => 3600,
+                'cache_dir' => 'data/' . $interrupterName
+            ],
+            'plugins' => ['serializer'],
+        ]);
+
+        return new SimpleCacheDecorator($storage);
     }
 
     /**
