@@ -116,7 +116,7 @@ class WorkerSystemAbstractFactory implements AbstractFactoryInterface
         ]);
     }
 
-    private static function buildStorage(ContainerInterface $container, $requestedName, array $options = null): CacheInterface
+    private static function buildStorage(ContainerInterface $container, $requestedName, array $options = null)
     {
         $interrupterName = sprintf('%s_CacheStorage', $requestedName);
         $storage = StorageFactory::factory([
@@ -128,7 +128,7 @@ class WorkerSystemAbstractFactory implements AbstractFactoryInterface
             'plugins' => ['serializer'],
         ]);
 
-        return new SimpleCacheDecorator($storage);
+        return $storage;
     }
 
     /**

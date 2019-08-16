@@ -15,6 +15,7 @@ use rollun\callback\Callback\Interrupter\InterrupterInterface;
 use rollun\callback\Callback\Interrupter\Process;
 use rollun\dic\InsideConstruct;
 use rollun\utils\Json\Serializer;
+use Zend\Cache\Storage\StorageInterface;
 use Zend\Db\ResultSet\ResultSetInterface;
 use Zend\Db\TableGateway\TableGateway;
 
@@ -75,7 +76,7 @@ class WorkerManager
      * @throws \ReflectionException
      */
     public function __construct(
-        CacheInterface $slotCache,
+        StorageInterface $slotCache,
         InterrupterInterface $interrupter,
         string $workerManagerName,
         int $processCount,
